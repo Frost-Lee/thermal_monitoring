@@ -12,7 +12,11 @@ def _get_embedding(face_image):
     reshaped_image = cv2.resize(face_image, (112, 112))
     return embedding_model.get_embedding(reshaped_image)[0]
 
-def is_same_person(face_image_1, face_image_2):
-    embedding_1 = _get_embedding(face_image_1)
-    embedding_2 = _get_embedding(face_image_2)
-    return scipy.spatial.distance.cosine(embedding_1, embedding_2) < config.FACE_SIMILARITY_THRESHOLD
+def is_same_face(thermal_face_1, thermal_face_2):
+    bounding_box_1 = thermal_face_1.bounding_box
+    bounding_box_2 = thermal_face_2.bounding_box
+    mid_x = (bounding_box_1[0] + bounding_box_1[2]) / 2
+    mid_y = (bounding_box_1[2] + bounding_box_1[3]) / 2
+    x_overlap = bounding_box_2[0] <= mid_x <= bounding_box_2[2]
+    y_overlap = bounding_box_2[1] <= mid_y <= bounding_box_2[3]
+    return x_overlap and y_overlap

@@ -1,35 +1,29 @@
-import socket
-import os
 import numpy as np
-from PIL import Image
 import cv2
+import time
 
 import thermal_face_tracker as tft
-            
-# HOST = ''
-# PORT = 50007
+import thermal_camera as tc
 
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# s.bind((HOST, PORT))
-# s.listen(1)
-# connection, address = s.accept()
-# print('connected by', address)
-# while 1:
-#     data = connection.recv(1024)
-#     if not data: break
-#     connection.send('got data'.encode())
-#     connection.sendall(data)
-# connection.close()
+MAX_CACHED_FRAMES = 64
+frame_cache = []
 
-frames = []
-for root, dirs, files in os.walk('/Users/Frost/Desktop/sample_frames'):
-    for file_name in files:
-        frames.append(tft.thermal_frame.ThermalFrame(np.array(Image.open(os.path.join(root, file_name)))))
-        frames[-1].detect()
-        cv2.imshow('frame', frames[-1].grey_frame)
-for index in range(1, len(frames)):
-    frames[index].link(frames[index - 1])
-face = frames[-1].thermal_faces[0]
-while face is not None:
-    print('1')
-    face = face.previous
+for raw_frame in tc.data_feed.file_feed('/Users/Frost/Desktop/thermal_data/mask_on_3.hdf5'):
+    thermal_frame = tft.thermal_frame.ThermalFrame(raw_frame)
+    cv2.imshow('frame', thermal_frame.grey_frame)
+    if len(frame_cache) > 0:
+        thermal_frame.link(frame_cache[-1])
+    frame_cache = frame_cache[0 if len(frame_cache) < MAX_CACHED_FRAMES else 1:] + [thermal_frame]
+    for index, face in enumerate(thermal_frame.thermal_faces):
+        frame_count = 1
+        mean_cache = [np.mean(face.breath_roi)]
+        while face.previous is not None:
+            face = face.previous
+            frame_count += 1
+            mean_cache.append(np.mean(face.breath_roi))
+        if frame_count > 35:
+            np.save('/Users/Frost/Desktop/a.npy', np.array(mean_cache))
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cv2.destroyAllWindows()
