@@ -11,6 +11,9 @@ def file_feed(path):
         for key_name in key_names:
             yield np.array(in_file[key_name]), time.time()
 
-def stream_feed():
+def stream_feed(gige_cam_id):
+    import matlab.engine
+    matlab_engine = matlab.engine.start_matlab()
+    gigecam = matlab_engine.gigecam(gige_cam_id)
     while True:
-        yield np.zeros((240, 320)), 0
+        yield np.array(matlab_engine.get_temperature(gigecam)), time.time()
