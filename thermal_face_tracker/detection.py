@@ -15,9 +15,7 @@ def get_face_detection(image):
         threshold=config.FACE_DETECTION_THRESHOLD,
         scale=1.0
     )
-    bounding_boxes = bounding_boxes.astype('int')
-    landmarks = landmarks.astype('int')
-    return bounding_boxes, landmarks
+    return bounding_boxes.astype(int)[:, :-1], landmarks.astype(int)
 
 # def get_breath_detection_roi(image, bounding_box, landmark):
 #     return image[
