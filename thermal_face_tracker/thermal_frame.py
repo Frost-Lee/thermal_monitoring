@@ -9,6 +9,16 @@ from . import utils
 
 
 class ThermalFrame(object):
+    """ An object that represents a frame that the thermal camera captures.
+
+    Attributes:
+        timestamp: The timestamp when the frame is captured. In seconds.
+        thermal_frame: The numpy array that represents the raw frame. Each element 
+            stands for the celsius temperature of the corresponding pixel.
+        grey_frame: The numpy array that is rescaled from `thermal_frame` to 0-255.
+        thermal_faces: The thermal_face.ThermalFace objects that is detected on 
+            the current frame.
+    """
 
     def __init__(self, thermal_frame, timestamp):
         self.timestamp = timestamp
@@ -18,10 +28,19 @@ class ThermalFrame(object):
         self._detect()
     
     def _detect(self):
+        """ Detect all face entities in this frame.
+        """
         bounding_boxes, landmarks = detection.get_face_detection(self.grey_frame)
         self.thermal_faces = [thermal_face.ThermalFace(self, b, l) for b, l in zip(bounding_boxes, landmarks)]
     
     def link(self, previous_frame):
+        """ Link the face entities of this frame with the face entities in the 
+            previous frame if they stands for the same face.
+        
+        Args:
+            previous_frame: The frame to be linked with. It should be the previous 
+                frame of this frame.
+        """
         matched_indices = []
         for face in self.thermal_faces:
             for index, previous_face in enumerate(previous_frame.thermal_faces):
@@ -31,10 +50,20 @@ class ThermalFrame(object):
                     break
     
     def detach(self):
+        """ Detach the face entity links with the previous frame.
+        """
         for face in self.thermal_faces:
             face.previous = None
     
     def annotated_frame(self, annotate_temperature=True, annotate_breath_rate=True):
+        """ Returns a grey frame with annotation, used for visualization.
+
+        Args:
+            annotate_temperature: Whether the body temperature should be annotated 
+                on the returned frame.
+            annotate_breath_rate: Whether the breath rate should be annotated on 
+                the returned frame.
+        """
         annotated_frame = self.grey_frame
         for face in self.thermal_faces:
             cv2.rectangle(
