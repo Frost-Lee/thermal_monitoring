@@ -2,6 +2,7 @@ import h5py
 import re
 import numpy as np
 import time
+import os
 
 def file_feed(path):
     frame_index_re = re.compile('\d+')
@@ -14,6 +15,7 @@ def file_feed(path):
 def stream_feed(gige_cam_id):
     import matlab.engine
     matlab_engine = matlab.engine.start_matlab()
-    gigecam = matlab_engine.gigecam(gige_cam_id)
+    matlab_engine.addpath(os.path.dirname(os.path.realpath(__file__)))
+    gigecam = matlab_engine.init_gigecam(gige_cam_id)
     while True:
         yield np.array(matlab_engine.get_temperature(gigecam)), time.time()
