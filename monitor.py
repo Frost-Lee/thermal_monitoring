@@ -2,6 +2,7 @@ import cv2
 import argparse
 import h5py
 import os
+import numpy as np
 
 import thermal_camera as tc
 
@@ -33,7 +34,8 @@ if args.record:
         print('Recording. Press Ctrl + C to stop.')
         for raw_frame, timestamp in tc.data_feed.stream_feed(args.record[0]):
             out_file['frame_{}/raw_frame'.format(frame_index)] = raw_frame
-            out_file['frame_{}/timestamp'.format(frame_index)] = timestamp
+            out_file['frame_{}/timestamp'.format(frame_index)] = np.array([timestamp])
+            frame_index += 1
             cv2.imshow('thermal monitoring', utils.rescale(raw_frame))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
