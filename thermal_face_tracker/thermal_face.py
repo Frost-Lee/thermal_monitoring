@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import interpolate
+from scipy import signal
 
 from . import utils
 from . import config
@@ -89,8 +90,8 @@ class ThermalFace(object):
         timestamps -= timestamps[0]
         cubic_spline = interpolate.CubicSpline(timestamps, samples)
         sample_axises = np.arange(np.min(timestamps), np.max(timestamps), config.SPLINE_SAMPLE_INTERVAL)
-        fft_max_x = (np.max(timestamps) - np.min(timestamps)) / config.SPLINE_SAMPLE_INTERVAL / 2
-        max_frequency = 1 / config.SPLINE_SAMPLE_INTERVAL
-        fft_roi = np.fft.fft(cubic_spline(sample_axises))[1:int(config.MAX_BREATH_FREQUENCY / max_frequency * fft_max_x)]
-        frequency = (np.argmax(fft_roi) + 1) / fft_max_x * max_frequency
-        return frequency
+        sample_frequencies, power_spectral_density = signal.periodogram(
+            cubic_spline(sample_axises), 
+            fs=1/config.SPLINE_SAMPLE_INTERVAL
+        )
+        return sample_frequencies[np.argmax(power_spectral_density)]
