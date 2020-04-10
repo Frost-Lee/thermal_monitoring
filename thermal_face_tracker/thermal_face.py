@@ -53,8 +53,10 @@ class ThermalFace(object):
         """
         bb_1, bb_2 = self.bounding_box, another_face.bounding_box
         def box_area(y_1, x_1, y_2, x_2):
-            area = (x_2 - x_1) * (y_2 - y_1)
-            return area if area > 0 else 0
+            if x_2 < x_1 or y_2 < y_1:
+                return 0
+            else:
+                return (x_2 - x_1) * (y_2 - y_1)
         intersection_area = box_area(
             max(bb_1[0], bb_2[0]),
             max(bb_1[1], bb_2[1]),
