@@ -41,6 +41,29 @@ class ThermalFace(object):
         """
         return utils.crop(self.parent.grey_frame, self.bounding_box)
     
+    def similarity(self, another_face):
+        """ Returns the similarity of the face with another face. The greater this 
+            value is, the more similar this face is with another face.
+        
+        The similarity ranges from 0 to 1 (boundary included). This implementation 
+        adopts IoU of the bounding boxes of the two faces.
+        
+        Args:
+            another_face: Another `thermal_face.ThermalFace` object to compare with.
+        """
+        bb_1, bb_2 = self.bounding_box, another_face.bounding_box
+        def box_area(y_1, x_1, y_2, x_2):
+            area = (x_2 - x_1) * (y_2 - y_1)
+            return area if area > 0 else 0
+        intersection_area = box_area(
+            max(bb_1[0], bb_2[0]),
+            max(bb_1[1], bb_2[1]),
+            min(bb_1[2], bb_2[2]),
+            min(bb_1[3], bb_2[3])
+        )
+        union_area = box_area(*bb_1) + box_area(*bb_2) - intersection_area
+        return intersection_area / union_area
+    
     @property
     def temperature_roi(self):
         """ Returns the cropped region of a part of the face in the thermal frame 

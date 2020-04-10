@@ -1,11 +1,12 @@
 import numpy as np
-import scipy
+from scipy import optimize
 import cv2
 
 from . import detection
 from . import recognition
 from . import thermal_face
 from . import utils
+from . import config
 
 
 class ThermalFrame(object):
@@ -41,13 +42,16 @@ class ThermalFrame(object):
             previous_frame: The frame to be linked with. It should be the previous 
                 frame of this frame.
         """
-        matched_indices = []
-        for face in self.thermal_faces:
-            for index, previous_face in enumerate(previous_frame.thermal_faces):
-                if index not in matched_indices and recognition.is_same_face(face,previous_face):
-                    face.previous = previous_face
-                    matched_indices.append(index)
-                    break
+        if len(self.thermal_faces) == 0 or len(previous_frame.thermal_faces) == 0:
+            return
+        similarity_matrix = np.zeros((len(self.thermal_faces), len(previous_frame.thermal_faces)))
+        for i, face in enumerate(self.thermal_faces):
+            for j, previous_face in enumerate(previous_frame.thermal_faces):
+                similarity_matrix[i, j] = face.similarity(previous_face)
+        cost_matrix = 1.0 - similarity_matrix
+        for i, j in zip(*optimize.linear_sum_assignment(cost_matrix)):
+            if similarity_matrix[i, j] > config.FACE_LINK_THRESHOLD:
+                self.thermal_faces[i].previous = previous_frame.thermal_faces[j]
     
     def detach(self):
         """ Detach the face entity links with the previous frame.
