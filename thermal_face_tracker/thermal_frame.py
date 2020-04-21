@@ -68,7 +68,7 @@ class ThermalFrame(object):
             annotate_breath_rate: Whether the breath rate should be annotated on 
                 the returned frame.
         """
-        annotated_frame = self.grey_frame
+        annotated_frame = cv2.UMat(self.grey_frame)
         for face in self.thermal_faces:
             cv2.rectangle(
                 annotated_frame, 

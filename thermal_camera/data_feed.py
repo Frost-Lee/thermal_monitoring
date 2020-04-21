@@ -26,4 +26,6 @@ def stream_feed(gige_camera_id):
     matlab_engine.addpath(os.path.dirname(os.path.realpath(__file__)))
     gigecam = matlab_engine.init_gigecam(gige_camera_id)
     while True:
-        yield np.array(matlab_engine.get_temperature(gigecam)), time.time()
+        raw_frame, timestamp = matlab_engine.get_temperature(gigecam), time.time()
+        frame = np.array(raw_frame._data).reshape(raw_frame.size, order='F')
+        yield frame, timestamp

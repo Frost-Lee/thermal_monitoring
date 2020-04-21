@@ -51,7 +51,6 @@ if args.estimate:
     print('Visualizing estimation result. Press Ctrl + C to stop.')
     for raw_frame, timestamp in feed:
         thermal_frame = tft.thermal_frame.ThermalFrame(raw_frame, timestamp)
-        thermal_frame = tft.thermal_frame.ThermalFrame(raw_frame, timestamp)
         if len(frame_cache) > 0:
             thermal_frame.link(frame_cache[-1])
         if len(frame_cache) >= MAX_CACHED_FRAMES:
