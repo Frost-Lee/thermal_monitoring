@@ -8,7 +8,7 @@ FACE_LINK_THRESHOLD = 0.2
 
 # The minimum sample amount for estimating breath rate. If a face is tracked for 
 # more frames than this threshold, breath rate estimation will be performed.
-BREATH_RATE_MIN_SAMPLE_THRESHOLD = 32
+BREATH_RATE_MIN_SAMPLE_THRESHOLD = 128
 
 # The cubic spline interval before performing FFT.
 SPLINE_SAMPLE_INTERVAL = 0.1

@@ -3,7 +3,6 @@ from scipy import optimize
 import cv2
 
 from . import detection
-from . import recognition
 from . import thermal_face
 from . import utils
 from . import config

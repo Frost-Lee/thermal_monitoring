@@ -6,7 +6,7 @@ import numpy as np
 
 import thermal_camera as tc
 
-MAX_CACHED_FRAMES = 128
+MAX_CACHED_FRAMES = 512
 frame_cache = []
 
 arg_parser = argparse.ArgumentParser(

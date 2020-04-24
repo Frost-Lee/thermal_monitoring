@@ -10,10 +10,10 @@ class ThermalFace(object):
     """ An object that represents a face entity within a thermal image.
 
     Attributes:
-        parent: The thermal_frame.ThermalFrame object that this face belongs to.
+        parent: The `thermal_frame.ThermalFrame` object that this face belongs to.
         bounding_box: The bounding box of the face in its belonging frame.
         landmark: The landmark of the face in its belonging frame.
-        previous: The thermal_face.ThermalFace object that is believed to be the 
+        previous: The `thermal_face.ThermalFace` object that is believed to be the 
             same face entity in the previous frame.
     """
 
@@ -100,8 +100,7 @@ class ThermalFace(object):
         
         This method summarize the average temperature in the `breath_roi` across 
             all historic tracked face entities. Then it performs FFT and extract 
-            the frequency with the maximum spectrum on the range 
-            (0, MAX_BREATH_FREQUENCY).
+            the frequency with the maximum spectrum.
         """
         root = self
         timestamps, samples = [], []
