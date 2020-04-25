@@ -51,6 +51,7 @@ class ThermalFrame(object):
         for i, j in zip(*optimize.linear_sum_assignment(cost_matrix)):
             if similarity_matrix[i, j] > config.FACE_LINK_THRESHOLD:
                 self.thermal_faces[i].previous = previous_frame.thermal_faces[j]
+                self.thermal_faces[i].uuid = previous_frame.thermal_faces[j].uuid
     
     def detach(self):
         """ Detach the face entity links with the previous frame.

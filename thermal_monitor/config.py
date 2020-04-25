@@ -15,3 +15,15 @@ SPLINE_SAMPLE_INTERVAL = 0.1
 
 # The ID of the GPU to be used. -1 for using CPU.
 GPU_ID = -1
+
+# The maximum cached frames for estimating breath rate.
+MAX_CACHED_FRAMES = 512
+
+# The temperature annotation will be updated every `TEMPERATURE_UPDATE_FRAMES` frames.
+TEMPERATURE_UPDATE_FRAMES = 8
+
+# The breath rate annotation will be updated every `BREATH_RATE_UPDATE_FRAMES` frames.
+BREATH_RATE_UPDATE_FRAMES = 8
+
+# The resolution for visualization.
+VISUALIZATION_RESOLUTION = (800, 600)

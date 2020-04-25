@@ -6,9 +6,6 @@ import numpy as np
 
 import thermal_camera as tc
 
-MAX_CACHED_FRAMES = 512
-frame_cache = []
-
 arg_parser = argparse.ArgumentParser(
     description='Real time & multiple people body temperature and repository rate estimation with thermal imaging.'
 )
@@ -28,7 +25,7 @@ arg_group.add_argument(
 args = arg_parser.parse_args()
 
 if args.record:
-    from thermal_face_tracker import utils
+    from thermal_monitor import utils
     with h5py.File(args.record[1], 'w') as out_file:
         frame_index = 0
         print('Recording. Press Ctrl + C to stop.')
@@ -36,29 +33,19 @@ if args.record:
             out_file['frame_{}/raw_frame'.format(frame_index)] = raw_frame
             out_file['frame_{}/timestamp'.format(frame_index)] = np.array([timestamp])
             frame_index += 1
-            cv2.imshow('thermal monitoring', utils.rescale(raw_frame))
+            cv2.imshow('thermal recording', utils.rescale(raw_frame))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     cv2.destroyAllWindows()
     exit()
 
 if args.estimate:
-    import thermal_face_tracker as tft
+    import thermal_monitor as tm
     if os.path.exists(args.estimate):
         feed = tc.data_feed.file_feed(args.estimate)
     else:
         feed = tc.data_feed.stream_feed(args.estimate)
     print('Visualizing estimation result. Press Ctrl + C to stop.')
-    for raw_frame, timestamp in feed:
-        thermal_frame = tft.thermal_frame.ThermalFrame(raw_frame, timestamp)
-        if len(frame_cache) > 0:
-            thermal_frame.link(frame_cache[-1])
-        if len(frame_cache) >= MAX_CACHED_FRAMES:
-            frame_cache.pop(0)
-            frame_cache[0].detach()
-        frame_cache.append(thermal_frame)
-        cv2.imshow('thermal monitoring', thermal_frame.annotated_frame())
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cv2.destroyAllWindows()
+    visualizer = tm.visualizer.Visualizer()
+    visualizer.run(feed)
     exit()
