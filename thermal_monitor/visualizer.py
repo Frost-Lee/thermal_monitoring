@@ -27,7 +27,7 @@ class Visualizer(object):
                 self._visualize_temperatures(annotation_frame, thermal_frame.thermal_faces)
             if visualize_breath_rate:
                 self._visualize_breath_rates(annotation_frame, thermal_frame.thermal_faces)
-            cv2.imshow('thermal monitoring', annotation_frame)
+            cv2.imshow('thermal monitoring', cv2.resize(annotation_frame, config.VISUALIZATION_RESOLUTION))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         cv2.destroyAllWindows()

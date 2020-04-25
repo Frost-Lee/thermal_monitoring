@@ -98,6 +98,7 @@ class ThermalFace(object):
             timestamps = [root.timestamp] + timestamps
             samples = [np.mean(root.breath_roi)] + samples
             root = root.previous
+        timestamps, samples = np.array(timestamps), np.array(samples)
         timestamps -= timestamps[0]
         return timestamps, samples
     
