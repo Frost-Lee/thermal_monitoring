@@ -16,7 +16,7 @@ class ThermalFrame(object):
         thermal_frame: The numpy array that represents the raw frame. Each element 
             stands for the celsius temperature of the corresponding pixel.
         grey_frame: The numpy array that is rescaled from `thermal_frame` to 0-255.
-        thermal_faces: The thermal_face.ThermalFace objects that is detected on 
+        thermal_faces: The `thermal_face.ThermalFace` objects that is detected on 
             the current frame.
     """
 
