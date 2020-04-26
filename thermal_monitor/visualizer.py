@@ -12,11 +12,10 @@ class Visualizer(object):
         self.thermal_frame_queue = []
         self.temperature_pool = {}
         self.breath_rate_pool = {}
-        self.ax_cache = []
+        self.breath_curve_ax_pool = {}
+        self.breath_curve_figure = None
     
     def run(self, feed, visualize_temperature=True, visualize_breath_rate=True, visualize_breath_curve=True):
-        if visualize_breath_curve:
-            self._visualize_breath_curves()
         for raw_frame, timestamp in feed:
             thermal_frame = ThermalFrame(raw_frame, timestamp)
             if len(self.thermal_frame_queue) > 0:
@@ -31,6 +30,8 @@ class Visualizer(object):
                 self._visualize_temperatures(annotation_frame, thermal_frame.thermal_faces)
             if visualize_breath_rate:
                 self._visualize_breath_rates(annotation_frame, thermal_frame.thermal_faces)
+            if visualize_breath_curve:
+                self._visualize_breath_curves()
             cv2.imshow('thermal monitoring', cv2.resize(annotation_frame, config.VISUALIZATION_RESOLUTION))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -97,22 +98,25 @@ class Visualizer(object):
             )
     
     def _visualize_breath_curves(self):
-        self.breath_curve_figure = plt.figure()
-        def update_curves(frame):
-            if len(self.thermal_frame_queue) == 0:
-                return
-            for ax in self.ax_cache:
-                ax.remove()
-            self.ax_cache = []
-            for index, face in enumerate(self.thermal_frame_queue[-1].thermal_faces):
+        if self.breath_curve_figure is None:
+            self.breath_curve_figure = plt.figure()
+            plt.show(block=False)
+        if set(self.thermal_frame_queue[-1].thermal_faces) != set(self.breath_curve_ax_pool.keys()):
+            for key, value in self.breath_curve_ax_pool.items():
+                value.remove()
+            self.breath_curve_ax_pool = {}
+        for index, face in enumerate(self.thermal_frame_queue[-1].thermal_faces):
+            if face.uuid not in self.breath_curve_ax_pool:
                 ax = self.breath_curve_figure.add_subplot(
                     len(self.thermal_frame_queue[-1].thermal_faces),
                     1,
                     index + 1,
                     label=face.uuid
                 )
-                self.ax_cache.append(ax)
-                ax.clear()
-                ax.plot(*face.breath_samples)
-        ani = animation.FuncAnimation(self.breath_curve_figure, update_curves, interval=10)
-        plt.show(block=False)
+                self.breath_curve_ax_pool[face.uuid] = ax
+            else:
+                ax = self.breath_curve_ax_pool[face.uuid]
+            ax.clear()
+            ax.plot(*face.breath_samples)
+        plt.draw()
+        plt.pause(0.001)
