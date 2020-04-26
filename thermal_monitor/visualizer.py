@@ -1,4 +1,6 @@
 import cv2
+from matplotlib import pyplot as plt
+from matplotlib import animation
 
 from .thermal_frame import ThermalFrame
 from .thermal_face import ThermalFace
@@ -10,9 +12,11 @@ class Visualizer(object):
         self.thermal_frame_queue = []
         self.temperature_pool = {}
         self.breath_rate_pool = {}
-        self.breath_curve_pool = {}
+        self.ax_cache = []
     
     def run(self, feed, visualize_temperature=True, visualize_breath_rate=True, visualize_breath_curve=True):
+        if visualize_breath_curve:
+            self._visualize_breath_curves()
         for raw_frame, timestamp in feed:
             thermal_frame = ThermalFrame(raw_frame, timestamp)
             if len(self.thermal_frame_queue) > 0:
@@ -91,3 +95,24 @@ class Visualizer(object):
                 (255, 0, 0),
                 1
             )
+    
+    def _visualize_breath_curves(self):
+        self.breath_curve_figure = plt.figure()
+        def update_curves(frame):
+            if len(self.thermal_frame_queue) == 0:
+                return
+            for ax in self.ax_cache:
+                ax.remove()
+            self.ax_cache = []
+            for index, face in enumerate(self.thermal_frame_queue[-1].thermal_faces):
+                ax = self.breath_curve_figure.add_subplot(
+                    len(self.thermal_frame_queue[-1].thermal_faces),
+                    1,
+                    index + 1,
+                    label=face.uuid
+                )
+                self.ax_cache.append(ax)
+                ax.clear()
+                ax.plot(*face.breath_samples)
+        ani = animation.FuncAnimation(self.breath_curve_figure, update_curves, interval=10)
+        plt.show(block=False)
