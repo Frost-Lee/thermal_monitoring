@@ -31,7 +31,7 @@ class Visualizer(object):
             if visualize_breath_rate:
                 self._visualize_breath_rates(annotation_frame, thermal_frame.thermal_faces)
             if visualize_breath_curve:
-                self._visualize_breath_curves()
+                self._visualize_breath_curves(thermal_frame.thermal_faces)
             cv2.imshow('thermal monitoring', cv2.resize(annotation_frame, config.VISUALIZATION_RESOLUTION))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -97,22 +97,17 @@ class Visualizer(object):
                 1
             )
     
-    def _visualize_breath_curves(self):
+    def _visualize_breath_curves(self, faces):
         if self.breath_curve_figure is None:
             self.breath_curve_figure = plt.figure()
             plt.show(block=False)
-        if set(self.thermal_frame_queue[-1].thermal_faces) != set(self.breath_curve_ax_pool.keys()):
+        if set([face.uuid for face in faces]) != set(self.breath_curve_ax_pool.keys()):
             for key, value in self.breath_curve_ax_pool.items():
                 value.remove()
             self.breath_curve_ax_pool = {}
-        for index, face in enumerate(self.thermal_frame_queue[-1].thermal_faces):
+        for index, face in enumerate(faces):
             if face.uuid not in self.breath_curve_ax_pool:
-                ax = self.breath_curve_figure.add_subplot(
-                    len(self.thermal_frame_queue[-1].thermal_faces),
-                    1,
-                    index + 1,
-                    label=face.uuid
-                )
+                ax = self.breath_curve_figure.add_subplot(len(faces), 1, index + 1, label=face.uuid)
                 self.breath_curve_ax_pool[face.uuid] = ax
             else:
                 ax = self.breath_curve_ax_pool[face.uuid]
