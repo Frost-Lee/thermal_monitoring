@@ -20,10 +20,13 @@ GPU_ID = -1
 MAX_CACHED_FRAMES = 512
 
 # The temperature annotation will be updated every `TEMPERATURE_UPDATE_FRAMES` frames.
-TEMPERATURE_UPDATE_FRAMES = 8
+TEMPERATURE_UPDATE_FRAMES = 5
 
 # The breath rate annotation will be updated every `BREATH_RATE_UPDATE_FRAMES` frames.
-BREATH_RATE_UPDATE_FRAMES = 8
+BREATH_RATE_UPDATE_FRAMES = 11
+
+# The breath curve plot will be updated every `BREATH_CURVE_UPDATE_FRAMES` frames.
+BREATH_CURVE_UPDATE_FRAMES = 7
 
 # The resolution for visualization.
 VISUALIZATION_RESOLUTION = (800, 600)

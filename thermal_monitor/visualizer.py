@@ -14,6 +14,7 @@ class Visualizer(object):
         self.breath_rate_pool = {}
         self.breath_curve_ax_pool = {}
         self.breath_curve_figure = None
+        self._plot_update_counter = config.BREATH_CURVE_UPDATE_FRAMES
     
     def run(self, feed, visualize_temperature=True, visualize_breath_rate=True, visualize_breath_curve=True):
         for raw_frame, timestamp in feed:
@@ -98,6 +99,10 @@ class Visualizer(object):
             )
     
     def _visualize_breath_curves(self, faces):
+        if self._plot_update_counter < config.BREATH_CURVE_UPDATE_FRAMES:
+            self._plot_update_counter += 1
+            return
+        self._plot_update_counter = 0
         if self.breath_curve_figure is None:
             self.breath_curve_figure = plt.figure()
             plt.show(block=False)
