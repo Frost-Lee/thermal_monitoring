@@ -1,3 +1,4 @@
+import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 from matplotlib import animation
@@ -5,6 +6,7 @@ from matplotlib import animation
 from .thermal_frame import ThermalFrame
 from .thermal_face import ThermalFace
 from . import config
+from . import utils
 
 
 class Visualizer(object):
@@ -15,7 +17,7 @@ class Visualizer(object):
         self.breath_curve_ax_pool = {}
         self.breath_curve_figure = None
         self._plot_update_counter = config.BREATH_CURVE_UPDATE_FRAMES
-        self._plain_font = [cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1]
+        self._plain_font = [cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1]
     
     def run(self, feed, visualize_temperature=True, visualize_breath_rate=True, visualize_breath_curve=True):
         for raw_frame, timestamp in feed:
@@ -26,7 +28,7 @@ class Visualizer(object):
                 self.thermal_frame_queue.pop(0)
                 self.thermal_frame_queue[0].detach()
             self.thermal_frame_queue.append(thermal_frame)
-            annotation_frame = cv2.UMat(thermal_frame.grey_frame)
+            annotation_frame = cv2.UMat(np.stack([thermal_frame.grey_frame] * 3, 2))
             self._visualize_bounding_boxes(annotation_frame, thermal_frame.thermal_faces)
             if visualize_temperature:
                 self._visualize_temperatures(annotation_frame, thermal_frame.thermal_faces)
@@ -45,13 +47,13 @@ class Visualizer(object):
                 annotation_frame, 
                 tuple(face.bounding_box[:2]), 
                 tuple(face.bounding_box[2:]), 
-                (255, 0, 0), 
+                utils.uuid_to_color(face.uuid, mode='bgr'), 
                 1
             )
             cv2.putText(
                 annotation_frame,
                 face.uuid[:4],
-                tuple(face.bounding_box[:2]),
+                (face.bounding_box[0], face.bounding_box[1] - 2),
                 *self._plain_font
             )
     
@@ -118,7 +120,7 @@ class Visualizer(object):
             else:
                 ax = self.breath_curve_ax_pool[face.uuid]
             ax.clear()
-            ax.plot(*face.breath_samples)
+            ax.plot(*face.breath_samples, c=utils.uuid_to_color(face.uuid, ub=1))
             ax.set_title(face.uuid[:4])
         plt.draw()
         plt.pause(0.001)

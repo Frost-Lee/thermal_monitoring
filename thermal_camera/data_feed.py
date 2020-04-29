@@ -9,7 +9,7 @@ def file_feed(path):
     Args:
         path: The path of the recording file.
     """
-    with h5py.File(path) as in_file:
+    with h5py.File(path, 'r') as in_file:
         key_names = [*map(str, in_file.keys())]
         key_names.sort(key=lambda x: int(x.split('_')[-1]))
         for key_name in key_names:
