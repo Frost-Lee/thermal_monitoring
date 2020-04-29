@@ -2,7 +2,7 @@
 
 Real time & multiple people body temperature and repository rate estimating with thermal imaging.
 
-![Demo](http://209.250.236.3:1910/bloghost/DsZS88qbjebkBAfj9pJXM7.gif)
+![Demo](http://209.250.236.3:1910/bloghost/vF9F6qYQcEo3Sx7zwtAy7L.gif)
 
 ### Requirement
 
@@ -38,3 +38,4 @@ See `./thermal_face_tracker/config.py` for configuration.
 
 - The body temperature estimation is the maximum temperature within the face bounding box, thus it could be affected by high temperature object in the background.
 - The system needs to accumulate some frames for repository rate estimation. If the tracking for the face got lost, the accumulation start from beginning.
+- As far as we have observed, the temperature estimation converge to the environment temperature as the distance to the camera grows. Thus for testing the body temperature, one should stay close to the camera.
