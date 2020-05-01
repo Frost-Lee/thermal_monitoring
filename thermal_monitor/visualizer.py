@@ -17,7 +17,6 @@ class Visualizer(object):
         self.breath_curve_ax_pool = {}
         self.breath_curve_figure = None
         self._plot_update_counter = config.BREATH_CURVE_UPDATE_FRAMES
-        self._plain_font = [cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1]
     
     def run(self, feed, visualize_temperature=True, visualize_breath_rate=True, visualize_breath_curve=True):
         for raw_frame, timestamp in feed:
@@ -54,7 +53,10 @@ class Visualizer(object):
                 annotation_frame,
                 face.uuid[:4],
                 (face.bounding_box[0], face.bounding_box[1] - 2),
-                *self._plain_font
+                cv2.FONT_HERSHEY_SIMPLEX, 
+                0.5, 
+                utils.uuid_to_color(face.uuid, mode='bgr'), 
+                1
             )
     
     def _visualize_temperatures(self, annotation_frame, faces):
@@ -75,7 +77,10 @@ class Visualizer(object):
                 annotation_frame,
                 str(temperature)[:5] + ' C',
                 (face.bounding_box[0], face.bounding_box[3] + 12),
-                *self._plain_font
+                cv2.FONT_HERSHEY_SIMPLEX, 
+                0.5, 
+                utils.uuid_to_color(face.uuid, mode='bgr'), 
+                1
             )
     
     def _visualize_breath_rates(self, annotation_frame, faces):
@@ -96,9 +101,12 @@ class Visualizer(object):
                 self.breath_rate_pool[face.uuid][0] += 1
             cv2.putText(
                 annotation_frame,
-                str(breath_rate)[:5] + 'Hz',
+                str(breath_rate * 60)[:5] + 'bpm',
                 (face.bounding_box[0], face.bounding_box[3] + 24),
-                *self._plain_font
+                cv2.FONT_HERSHEY_SIMPLEX, 
+                0.5, 
+                utils.uuid_to_color(face.uuid, mode='bgr'), 
+                1
             )
     
     def _visualize_breath_curves(self, faces):
@@ -115,7 +123,7 @@ class Visualizer(object):
             self.breath_curve_ax_pool = {}
         for index, face in enumerate(faces):
             if face.uuid not in self.breath_curve_ax_pool:
-                ax = self.breath_curve_figure.add_subplot(1, len(faces), index + 1, label=face.uuid)
+                ax = self.breath_curve_figure.add_subplot(len(faces), 1, index + 1, label=face.uuid)
                 self.breath_curve_ax_pool[face.uuid] = ax
             else:
                 ax = self.breath_curve_ax_pool[face.uuid]
