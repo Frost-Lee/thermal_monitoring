@@ -16,8 +16,7 @@ def get_face_detection(image):
     Returns:
         The bounding boxes and landmarks of the detected faces.
     """
-    duplicated_image = np.array([image for _ in range(3)])
-    duplicated_image = np.transpose(duplicated_image, axes=(1, 2, 0))
+    duplicated_image = np.stack([image] * 3, 2)
     bounding_boxes, landmarks = detection_model.detect(
         duplicated_image,
         threshold=config.FACE_DETECTION_THRESHOLD,

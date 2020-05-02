@@ -101,7 +101,7 @@ class Visualizer(object):
                 self.breath_rate_pool[face.uuid][0] += 1
             cv2.putText(
                 annotation_frame,
-                str(breath_rate * 60)[:5] + 'bpm',
+                str(breath_rate * 60)[:5] + ' bpm',
                 (face.bounding_box[0], face.bounding_box[3] + 24),
                 cv2.FONT_HERSHEY_SIMPLEX, 
                 0.5, 
