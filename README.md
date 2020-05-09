@@ -4,11 +4,17 @@ Real time & multiple people body temperature and repository rate estimating with
 
 ![Demo](http://209.250.236.3:1910/bloghost/vF9F6qYQcEo3Sx7zwtAy7L.gif)
 
-### Requirement
+### Dependencies
 
 - MATLAB required
+    - Image Acquisition Toolbox
+    - Image Acquisition Toolbox Support Package for GigE Vision Hardware
+- Python packages
+    - insightface
+    - opencv-python
+    - mxnet-cu90mkl (GPU) or mxnet-mkl (CPU)
+    - etc
 - GIGE thermal camera (tested on [FLIR A35](https://www.flir.com/products/a35/))
-- Some other python package dependencies
 
 ### Quick Start
 
@@ -39,3 +45,8 @@ See `./thermal_face_tracker/config.py` for configuration.
 - The body temperature estimation is the maximum temperature within the face bounding box, thus it could be affected by high temperature object in the background.
 - The system needs to accumulate some frames for repository rate estimation. If the tracking for the face got lost, the accumulation start from beginning.
 - As far as we have observed, the temperature estimation converge to the environment temperature as the distance to the camera grows. Thus for testing the body temperature, one should stay close to the camera.
+
+### See Also
+
+https://github.com/boston-dynamics/bosdyn-hospital-bot
+
