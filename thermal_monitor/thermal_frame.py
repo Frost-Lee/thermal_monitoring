@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import optimize
 import cv2
+from deprecated import deprecated
 
 from . import detection
 from . import thermal_face
@@ -59,6 +60,7 @@ class ThermalFrame(object):
         for face in self.thermal_faces:
             face.previous = None
     
+    @deprecated(reason='annoted_frame is deprecated, use visualizer for visualization instead.')
     def annotated_frame(self, annotate_temperature=True, annotate_breath_rate=True):
         """ Returns a grey frame with annotation, used for visualization.
 
