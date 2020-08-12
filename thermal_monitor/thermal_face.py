@@ -24,25 +24,25 @@ class ThermalFace(object):
         self.bounding_box = bounding_box
         self.landmark = landmark
         self.previous = None
-    
+
     @property
     def timestamp(self):
         """ Returns the timestamp of the frame that the face entity belongs to.
         """
         return self.parent.timestamp
-    
+
     @property
     def thermal_image(self):
         """ Returns the cropped region of the face in the thermal frame.
         """
         return utils.crop(self.parent.thermal_frame, self.bounding_box)
-    
+
     @property
     def grey_image(self):
         """ Returns the cropped region of the face in the grey frame.
         """
         return utils.crop(self.parent.grey_frame, self.bounding_box)
-    
+
     def similarity(self, another_face):
         """ Returns the similarity of the face with another face. The greater this 
             value is, the more similar this face is with another face.
@@ -54,6 +54,7 @@ class ThermalFace(object):
             another_face: Another `thermal_face.ThermalFace` object to compare with.
         """
         bb_1, bb_2 = self.bounding_box, another_face.bounding_box
+
         def box_area(y_1, x_1, y_2, x_2):
             if x_2 < x_1 or y_2 < y_1:
                 return 0
@@ -67,14 +68,14 @@ class ThermalFace(object):
         )
         union_area = box_area(*bb_1) + box_area(*bb_2) - intersection_area
         return intersection_area / union_area
-    
+
     @property
     def temperature_roi(self):
         """ Returns the cropped region of a part of the face in the thermal frame 
             that is used for body temperature estimation.
         """
         return utils.crop(self.parent.thermal_frame, self.bounding_box)
-    
+
     @property
     def breath_roi(self):
         """ Returns the cropped region of a part of the face in the thermal frame 
@@ -86,7 +87,7 @@ class ThermalFace(object):
             (self.landmark[4, 0] + self.bounding_box[2]) // 2,
             self.bounding_box[3]
         ])
-    
+
     @property
     def breath_samples(self):
         """ Returns the timestamps and breath ROI average temperature samples for 
@@ -101,14 +102,14 @@ class ThermalFace(object):
         timestamps, samples = np.array(timestamps), np.array(samples)
         timestamps -= timestamps[0]
         return timestamps, samples
-    
+
     @property
     def temperature(self):
         """ Returns the temperature estimation of the face entity. The return value 
             is `None` if the estimation is not available.
         """
         return np.max(self.temperature_roi)
-    
+
     @property
     def breath_rate(self):
         """ Returns the breath rate (frequency) estimation of the face entity. The 
@@ -118,14 +119,13 @@ class ThermalFace(object):
             all historic tracked face entities. Then it performs FFT and extract 
             the frequency with the maximum spectrum.
         """
-        root = self
         timestamps, samples = self.breath_samples
         if len(timestamps) < config.BREATH_RATE_MIN_SAMPLE_THRESHOLD:
             return None
         cubic_spline = interpolate.CubicSpline(timestamps, samples)
-        sample_axises = np.arange(np.min(timestamps), np.max(timestamps), config.SPLINE_SAMPLE_INTERVAL)
+        sample_axes = np.arange(np.min(timestamps), np.max(timestamps), config.SPLINE_SAMPLE_INTERVAL)
         sample_frequencies, power_spectral_density = signal.periodogram(
-            cubic_spline(sample_axises), 
+            cubic_spline(sample_axes),
             fs=1/config.SPLINE_SAMPLE_INTERVAL
         )
         return sample_frequencies[np.argmax(power_spectral_density)]

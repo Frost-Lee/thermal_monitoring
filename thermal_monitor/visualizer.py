@@ -1,10 +1,8 @@
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
-from matplotlib import animation
 
 from .thermal_frame import ThermalFrame
-from .thermal_face import ThermalFace
 from . import config
 from . import utils
 
@@ -17,7 +15,7 @@ class Visualizer(object):
         self.breath_curve_ax_pool = {}
         self.breath_curve_figure = None
         self._plot_update_counter = config.BREATH_CURVE_UPDATE_FRAMES
-    
+
     def run(self, feed, visualize_temperature=True, visualize_breath_rate=True, visualize_breath_curve=True):
         for raw_frame, timestamp in feed:
             thermal_frame = ThermalFrame(raw_frame, timestamp)
@@ -39,26 +37,26 @@ class Visualizer(object):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         cv2.destroyAllWindows()
-    
+
     def _visualize_bounding_boxes(self, annotation_frame, faces):
         for face in faces:
             cv2.rectangle(
-                annotation_frame, 
-                tuple(face.bounding_box[:2]), 
-                tuple(face.bounding_box[2:]), 
-                utils.uuid_to_color(face.uuid, mode='bgr'), 
+                annotation_frame,
+                tuple(face.bounding_box[:2]),
+                tuple(face.bounding_box[2:]),
+                utils.uuid_to_color(face.uuid, mode='bgr'),
                 1
             )
             cv2.putText(
                 annotation_frame,
                 face.uuid[:4],
                 (face.bounding_box[0], face.bounding_box[1] - 2),
-                cv2.FONT_HERSHEY_SIMPLEX, 
-                0.5, 
-                utils.uuid_to_color(face.uuid, mode='bgr'), 
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                utils.uuid_to_color(face.uuid, mode='bgr'),
                 1
             )
-    
+
     def _visualize_temperatures(self, annotation_frame, faces):
         face_uuids = [face.uuid for face in faces]
         keys = [*self.temperature_pool.keys()]
@@ -66,7 +64,6 @@ class Visualizer(object):
             if key not in face_uuids:
                 self.temperature_pool.pop(key, None)
         for face in faces:
-            temperature = -1
             if face.uuid not in self.temperature_pool or self.temperature_pool[face.uuid][0] >= config.TEMPERATURE_UPDATE_FRAMES:
                 temperature = face.temperature
                 self.temperature_pool[face.uuid] = [0, temperature]
@@ -82,7 +79,7 @@ class Visualizer(object):
                 utils.uuid_to_color(face.uuid, mode='bgr'), 
                 1
             )
-    
+
     def _visualize_breath_rates(self, annotation_frame, faces):
         face_uuids = [face.uuid for face in faces]
         keys = [*self.breath_rate_pool.keys()]
@@ -90,7 +87,6 @@ class Visualizer(object):
             if key not in face_uuids:
                 self.breath_rate_pool.pop(key, None)
         for face in faces:
-            breath_rate = -1
             if face.uuid not in self.breath_rate_pool or self.breath_rate_pool[face.uuid][0] >= config.BREATH_RATE_UPDATE_FRAMES:
                 breath_rate = face.breath_rate
                 if breath_rate is None:
@@ -108,7 +104,7 @@ class Visualizer(object):
                 utils.uuid_to_color(face.uuid, mode='bgr'), 
                 1
             )
-    
+
     def _visualize_breath_curves(self, faces):
         if self._plot_update_counter < config.BREATH_CURVE_UPDATE_FRAMES:
             self._plot_update_counter += 1

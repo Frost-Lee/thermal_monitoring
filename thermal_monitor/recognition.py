@@ -1,12 +1,9 @@
-import numpy as np
 import insightface
 import cv2
-import scipy
-
-from . import config
 
 embedding_model = insightface.model_zoo.get_model('arcface_r100_v1')
-embedding_model.prepare(ctx_id = -1)
+embedding_model.prepare(ctx_id=-1)
+
 
 def get_embedding(face_image):
     """ Returns the embedding vector for a given face image.

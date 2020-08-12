@@ -27,17 +27,17 @@ class ThermalFrame(object):
         self.grey_frame = utils.rescale(thermal_frame)
         self.thermal_faces = []
         self._detect()
-    
+
     def _detect(self):
         """ Detect all face entities in this frame.
         """
         bounding_boxes, landmarks = detection.get_face_detection(self.grey_frame)
         self.thermal_faces = [thermal_face.ThermalFace(self, b, l) for b, l in zip(bounding_boxes, landmarks)]
-    
+
     def link(self, previous_frame):
         """ Link the face entities of this frame with the face entities in the 
             previous frame if they stands for the same face.
-        
+
         Args:
             previous_frame: The frame to be linked with. It should be the previous 
                 frame of this frame.
@@ -53,14 +53,14 @@ class ThermalFrame(object):
             if similarity_matrix[i, j] > config.FACE_LINK_THRESHOLD:
                 self.thermal_faces[i].previous = previous_frame.thermal_faces[j]
                 self.thermal_faces[i].uuid = previous_frame.thermal_faces[j].uuid
-    
+
     def detach(self):
         """ Detach the face entity links with the previous frame.
         """
         for face in self.thermal_faces:
             face.previous = None
-    
-    @deprecated(reason='annoted_frame is deprecated, use visualizer for visualization instead.')
+
+    @deprecated(reason='annotated_frame is deprecated, use visualizer for visualization instead.')
     def annotated_frame(self, annotate_temperature=True, annotate_breath_rate=True):
         """ Returns a grey frame with annotation, used for visualization.
 
