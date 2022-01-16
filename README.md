@@ -2,7 +2,7 @@
 
 Real time & multiple people body temperature and repository rate estimating with thermal imaging.
 
-![Demo](https://tsanchenli.com:1910/bloghost/vF9F6qYQcEo3Sx7zwtAy7L.gif)
+![Demo](https://tsanchenli.com/s2/vF9F6qYQcEo3Sx7zwtAy7L.gif)
 
 ### Dependencies
 
